@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: bedtime-ai-backend
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: LLM_PROVIDER
+        value: openai
+      - key: TTS_PROVIDER
+        value: sarvam
+      - key: VOICE_PROVIDER
+        value: sarvam
+      - key: SPEECH_PROVIDER
+        value: openai
+      - key: STORAGE_PROVIDER
+        value: local
+      - key: AUDIO_MODE
+        value: full_file
+      - key: SIGNED_URL_EXPIRY_SECONDS
+        value: 900
+      - key: MAX_VOICE_FILE_MB
+        value: 25
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SARVAM_API_KEY
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_S3_BUCKET
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
