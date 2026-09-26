@@ -68,8 +68,13 @@ export function initializeProviders() {
 
   // 4. Storage Providers
   providerRegistry.registerStorage(new MockStorageProvider());
+  const storageBaseUrl =
+    process.env.PUBLIC_API_URL || process.env.RENDER_EXTERNAL_URL
+      ? `${(process.env.PUBLIC_API_URL || process.env.RENDER_EXTERNAL_URL)!.replace(/\/$/, "")}/api/v1/storage`
+      : `http://localhost:${config.port}/api/v1/storage`;
+
   providerRegistry.registerStorage(
-    new LocalStorageProvider(config.localStorageDir, `http://localhost:${config.port}/api/v1/storage`)
+    new LocalStorageProvider(config.localStorageDir, storageBaseUrl)
   );
   providerRegistry.registerStorage(
     new S3StorageProvider({
