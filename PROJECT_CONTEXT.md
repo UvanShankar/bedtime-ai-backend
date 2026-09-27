@@ -94,12 +94,12 @@ bedtime-ai/
 │   │   │   │   └── mock/MockLLMProvider.ts          # Deterministic test generator
 │   │   │   ├── tts/
 │   │   │   │   ├── openai/OpenAITTSProvider.ts      # OpenAI tts-1 audio synthesis
-│   │   │   │   ├── sarvam/SarvamTTSProvider.ts      # Sarvam AI bulbul:v1 synthesis + chunking
+│   │   │   │   ├── sarvam/SarvamTTSProvider.ts      # Sarvam AI: /voices/clone (cloned) & bulbul:v1 (preset)
 │   │   │   │   ├── elevenlabs/ElevenLabsTTSProvider.ts # ElevenLabs v2 multilingual synthesis
 │   │   │   │   └── mock/MockTTSProvider.ts          # Zero-token mock audio synthesizer
 │   │   │   ├── voice/
-│   │   │   │   ├── sarvam/SarvamVoiceCloneProvider.ts
-│   │   │   │   ├── elevenlabs/ElevenLabsVoiceCloneProvider.ts
+│   │   │   │   ├── sarvam/SarvamVoiceCloneProvider.ts # Sarvam AI 1-shot voice cloning (/voices/create)
+│   │   │   │   ├── elevenlabs/ElevenLabsVoiceCloneProvider.ts # ElevenLabs instant cloning (/voices/add)
 │   │   │   │   └── mock/MockVoiceCloneProvider.ts
 │   │   │   ├── speech/
 │   │   │   │   ├── openai/OpenAISpeechToTextProvider.ts # Whisper API
