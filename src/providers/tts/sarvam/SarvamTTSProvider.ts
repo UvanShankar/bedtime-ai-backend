@@ -33,6 +33,7 @@ const SARVAM_SUPPORTED_LANGUAGES: Record<string, string> = {
   "pa": "pa-IN",
   "od-in": "od-IN",
   "od": "od-IN",
+  "as-in": "as-IN",
 };
 
 export class SarvamTTSProvider implements TTSProvider {
@@ -59,23 +60,27 @@ export class SarvamTTSProvider implements TTSProvider {
     const langKey = (input.languageCode || "en-IN").toLowerCase();
     const targetLanguageCode = SARVAM_SUPPORTED_LANGUAGES[langKey] || "en-IN";
 
+    // Detect if this is a custom cloned voice ID (e.g. svc-...) or standard preset speaker
+    const isClonedVoice = typeof input.voiceId === "string" && input.voiceId.startsWith("svc-");
     const validSpeakers = ["meera", "arvind", "pavithra", "maitreyi", "amartya", "pooja", "kavya", "ratan", "ananya", "priya"];
     const speaker = validSpeakers.includes(input.voiceId?.toLowerCase()) ? input.voiceId.toLowerCase() : "meera";
 
-    // Split text into chunks <= 450 characters to adhere to Sarvam's 500-char input limit
+    // Split text into chunks to respect Sarvam limits (500 for standard, 1000 for cloned)
+    const maxChunkLength = isClonedVoice ? 900 : 480;
     const combinedText = input.segments.map((s) => s.text).join(" ... ");
     const chunks: string[] = [];
-    if (combinedText.length <= 480) {
+
+    if (combinedText.length <= maxChunkLength) {
       chunks.push(combinedText);
     } else {
       const sentences = combinedText.split(/(?<=[.?!])\s+/);
       let currentChunk = "";
       for (const sentence of sentences) {
-        if ((currentChunk + " " + sentence).trim().length <= 480) {
+        if ((currentChunk + " " + sentence).trim().length <= maxChunkLength) {
           currentChunk = (currentChunk + " " + sentence).trim();
         } else {
           if (currentChunk) chunks.push(currentChunk);
-          currentChunk = sentence.slice(0, 480);
+          currentChunk = sentence.slice(0, maxChunkLength);
         }
       }
       if (currentChunk) chunks.push(currentChunk);
@@ -87,36 +92,59 @@ export class SarvamTTSProvider implements TTSProvider {
       let lastRequestId: string | undefined;
 
       for (const chunk of chunks) {
-        const response = await fetch(`${this.baseUrl}/text-to-speech`, {
-          method: "POST",
-          headers: {
-            "api-subscription-key": this.apiKey,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            inputs: [chunk],
-            target_language_code: targetLanguageCode,
-            speaker,
-            model: "bulbul:v1",
-            pace: 0.9,
-            speech_sample_rate: 22050,
-            enable_preprocessing: true,
-          }),
-        });
+        let response: Response;
+
+        if (isClonedVoice) {
+          // Use official POST /voices/clone API for cloned parent voices
+          const formData = new FormData();
+          formData.append("voice_id", input.voiceId);
+          formData.append("text", chunk);
+          formData.append("language_code", targetLanguageCode);
+          formData.append("pace", "0.9");
+          formData.append("output_audio_codec", "wav");
+
+          response = await fetch(`${this.baseUrl}/voices/clone`, {
+            method: "POST",
+            headers: {
+              "api-subscription-key": this.apiKey,
+            },
+            body: formData,
+          });
+        } else {
+          // Use standard POST /text-to-speech for pre-built Sarvam speakers
+          response = await fetch(`${this.baseUrl}/text-to-speech`, {
+            method: "POST",
+            headers: {
+              "api-subscription-key": this.apiKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              inputs: [chunk],
+              target_language_code: targetLanguageCode,
+              speaker,
+              model: "bulbul:v1",
+              pace: 0.9,
+              speech_sample_rate: 22050,
+              enable_preprocessing: true,
+            }),
+          });
+        }
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new AppError(`Sarvam TTS API returned ${response.status}: ${errorText}`, "TTS_FAILED", 502);
+          throw new AppError(`Sarvam synthesis API returned ${response.status}: ${errorText}`, "TTS_FAILED", 502);
         }
 
-        const data = (await response.json()) as { audios?: string[]; request_id?: string };
-        if (!data.audios || data.audios.length === 0) {
+        const data = (await response.json()) as any;
+        const base64Audio = isClonedVoice ? data.audio : data.audios?.[0];
+
+        if (!base64Audio) {
           throw new AppError("Sarvam returned empty audio data", "TTS_FAILED", 502);
         }
 
-        const buf = Buffer.from(data.audios[0], "base64");
+        const buf = Buffer.from(base64Audio, "base64");
         audioBuffers.push(buf);
-        totalDuration += Math.round(buf.length / (22050 * 2));
+        totalDuration += data.audio_duration ? Math.round(data.audio_duration) : Math.round(buf.length / (22050 * 2));
         lastRequestId = data.request_id;
       }
 
