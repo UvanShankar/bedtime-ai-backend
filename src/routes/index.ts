@@ -13,12 +13,25 @@ apiRouter.use("/children", childRoutes);
 apiRouter.use("/stories", storyRoutes);
 apiRouter.use("/storage", storageRoutes);
 
+import { config } from "../config/index.js";
+
 // Health check endpoint
 apiRouter.get("/health", (_req, res) => {
   res.json({
     status: "ok",
     timestamp: new Date().toISOString(),
     service: "bedtime-ai-backend",
+    providers: {
+      llm: config.providers.llm,
+      tts: config.providers.tts,
+      storage: config.providers.storage,
+      speech: config.providers.speech,
+      keys: {
+        hasOpenAIKey: Boolean(config.openai.apiKey),
+        hasSarvamKey: Boolean(config.sarvam.apiKey),
+        hasElevenLabsKey: Boolean(config.elevenlabs.apiKey),
+      },
+    },
   });
 });
 

@@ -1,23 +1,31 @@
 import { TTSProvider, TTSRequest, TTSResult } from "../../../types/providers.js";
 import { AppError } from "../../../errors/AppError.js";
+import { OpenAITTSProvider } from "../openai/OpenAITTSProvider.js";
 
 export interface ElevenLabsTTSOptions {
   apiKey?: string;
   baseUrl?: string;
+  openaiFallback?: OpenAITTSProvider;
 }
 
 export class ElevenLabsTTSProvider implements TTSProvider {
   public readonly name = "elevenlabs";
   private apiKey?: string;
   private baseUrl: string;
+  private openaiFallback?: OpenAITTSProvider;
 
   constructor(options: ElevenLabsTTSOptions) {
     this.apiKey = options.apiKey;
     this.baseUrl = options.baseUrl || "https://api.elevenlabs.io/v1";
+    this.openaiFallback = options.openaiFallback;
   }
 
   async synthesize(input: TTSRequest): Promise<TTSResult> {
     if (!this.apiKey) {
+      if (this.openaiFallback) {
+        console.warn("[ElevenLabsTTSProvider] ElevenLabs API key not configured; falling back to OpenAI TTS");
+        return this.openaiFallback.synthesize(input);
+      }
       throw new AppError("ElevenLabs API key is required", "TTS_FAILED", 500);
     }
 
@@ -60,10 +68,13 @@ export class ElevenLabsTTSProvider implements TTSProvider {
       return {
         audioBuffer,
         mimeType: "audio/mpeg",
-        durationSeconds: Math.round(audioBuffer.length / 16000), // approximate for 128kbps mp3
-        providerRequestId: response.headers.get("request-id") || undefined,
+        durationSeconds: Math.round(audioBuffer.length / (16000 * 2)),
       };
     } catch (err: any) {
+      if (this.openaiFallback) {
+        console.warn(`[ElevenLabsTTSProvider] Synthesis failed: ${err.message}. Falling back to OpenAI TTS.`);
+        return this.openaiFallback.synthesize(input);
+      }
       if (err instanceof AppError) throw err;
       throw new AppError(`ElevenLabs TTS synthesis failed: ${err.message}`, "TTS_FAILED", 502, err);
     }
@@ -71,11 +82,20 @@ export class ElevenLabsTTSProvider implements TTSProvider {
 
   async *synthesizeStream(input: TTSRequest): AsyncIterable<Uint8Array> {
     if (!this.apiKey) {
+      if (this.openaiFallback) {
+        yield* this.openaiFallback.synthesizeStream(input);
+        return;
+      }
       throw new AppError("ElevenLabs API key is required", "TTS_FAILED", 500);
     }
 
+    const defaultVoice = "21m00Tcm4TlvDq8ikWAM";
+    const voiceId =
+      input.voiceId && input.voiceId !== "default" && !input.voiceId.startsWith("mock")
+        ? input.voiceId
+        : defaultVoice;
+
     const combinedText = input.segments.map((s) => s.text).join(" ... ");
-    const voiceId = input.voiceId || "21m00Tcm4TlvDq8ikWAM";
 
     const response = await fetch(`${this.baseUrl}/text-to-speech/${voiceId}/stream`, {
       method: "POST",
@@ -87,15 +107,12 @@ export class ElevenLabsTTSProvider implements TTSProvider {
       body: JSON.stringify({
         text: combinedText,
         model_id: "eleven_multilingual_v2",
-        voice_settings: {
-          stability: 0.8,
-          similarity_boost: 0.85,
-        },
       }),
     });
 
     if (!response.ok || !response.body) {
-      throw new AppError(`ElevenLabs stream returned error ${response.status}`, "TTS_FAILED", 502);
+      const errorText = await response.text();
+      throw new AppError(`ElevenLabs TTS streaming returned ${response.status}: ${errorText}`, "TTS_FAILED", 502);
     }
 
     const reader = (response.body as any).getReader();

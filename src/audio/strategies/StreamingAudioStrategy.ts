@@ -11,7 +11,7 @@ export class StreamingAudioStrategy implements AudioStrategy {
 
     return {
       audioUrl: streamUrl,
-      mimeType: ttsProvider.name === "elevenlabs" ? "audio/mpeg" : "audio/wav",
+      mimeType: ttsProvider.name === "elevenlabs" || ttsProvider.name === "openai" ? "audio/mpeg" : "audio/wav",
       mode: "streaming",
     };
   }

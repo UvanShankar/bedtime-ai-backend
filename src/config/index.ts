@@ -27,7 +27,7 @@ export interface AppConfig {
   };
   providers: {
     llm: "openai" | "mock";
-    tts: "sarvam" | "elevenlabs" | "mock";
+    tts: "openai" | "sarvam" | "elevenlabs" | "mock";
     voice: "sarvam" | "elevenlabs" | "mock";
     storage: "s3" | "local" | "mock";
     speech: "openai" | "sarvam" | "mock";
@@ -63,7 +63,15 @@ export const config: AppConfig = {
   },
   providers: {
     llm: (process.env.LLM_PROVIDER as any) || "openai",
-    tts: (process.env.TTS_PROVIDER as any) || (process.env.ELEVENLABS_API_KEY ? "elevenlabs" : "sarvam"),
+    tts:
+      (process.env.TTS_PROVIDER as any) ||
+      (process.env.SARVAM_API_KEY
+        ? "sarvam"
+        : process.env.OPENAI_API_KEY
+        ? "openai"
+        : process.env.ELEVENLABS_API_KEY
+        ? "elevenlabs"
+        : "openai"),
     voice: (process.env.VOICE_PROVIDER as any) || (process.env.ELEVENLABS_API_KEY ? "elevenlabs" : "sarvam"),
     storage:
       (process.env.STORAGE_PROVIDER as any) ||

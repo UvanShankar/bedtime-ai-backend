@@ -134,6 +134,7 @@ export class StoryController {
       } catch (audioErr: any) {
         console.error(`[Audio Synthesis Error]`, audioErr);
         story.audioStatus = "failed";
+        story.audioError = audioErr?.message || String(audioErr);
       }
 
       // 9. Persist Story

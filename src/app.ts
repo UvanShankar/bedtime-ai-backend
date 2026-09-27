@@ -11,6 +11,7 @@ import { MockLLMProvider } from "./providers/llm/mock/MockLLMProvider.js";
 
 import { SarvamTTSProvider } from "./providers/tts/sarvam/SarvamTTSProvider.js";
 import { ElevenLabsTTSProvider } from "./providers/tts/elevenlabs/ElevenLabsTTSProvider.js";
+import { OpenAITTSProvider } from "./providers/tts/openai/OpenAITTSProvider.js";
 import { MockTTSProvider } from "./providers/tts/mock/MockTTSProvider.js";
 
 import { SarvamVoiceCloneProvider } from "./providers/voice/sarvam/SarvamVoiceCloneProvider.js";
@@ -37,17 +38,21 @@ export function initializeProviders() {
   );
 
   // 2. TTS Providers
+  const openAITTS = new OpenAITTSProvider(config.openai.apiKey);
   providerRegistry.registerTTS(new MockTTSProvider());
+  providerRegistry.registerTTS(openAITTS);
   providerRegistry.registerTTS(
     new SarvamTTSProvider({
       apiKey: config.sarvam.apiKey,
       baseUrl: config.sarvam.baseUrl,
+      openaiFallback: openAITTS,
     })
   );
   providerRegistry.registerTTS(
     new ElevenLabsTTSProvider({
       apiKey: config.elevenlabs.apiKey,
       baseUrl: config.elevenlabs.baseUrl,
+      openaiFallback: openAITTS,
     })
   );
 

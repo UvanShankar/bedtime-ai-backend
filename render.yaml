@@ -15,7 +15,7 @@ services:
       - key: LLM_PROVIDER
         value: openai
       - key: TTS_PROVIDER
-        value: sarvam
+        value: openai
       - key: VOICE_PROVIDER
         value: sarvam
       - key: SPEECH_PROVIDER

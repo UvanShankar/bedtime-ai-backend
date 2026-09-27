@@ -38,7 +38,7 @@ export class FullFileAudioStrategy implements AudioStrategy {
 }
 
 function ttsResultMime(providerName: string): string {
-  if (providerName === "elevenlabs") return "audio/mpeg";
+  if (providerName === "elevenlabs" || providerName === "openai") return "audio/mpeg";
   return "audio/wav";
 }
 

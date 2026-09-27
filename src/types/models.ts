@@ -124,6 +124,7 @@ export interface Story {
   audioKey?: string;
   audioUrl?: string; // Pre-signed or streaming URL
   audioDurationSeconds?: number;
+  audioError?: string;
   ttsProvider?: string;
   createdAt: string;
 }
