@@ -26,7 +26,7 @@ The codebase is partitioned into two independent GitHub repositories under accou
 | Repository | GitHub URL | Local Path | Stack | CI/CD Status |
 | :--- | :--- | :--- | :--- | :--- |
 | **Backend** | [`UvanShankar/bedtime-ai-backend`](https://github.com/UvanShankar/bedtime-ai-backend) | `C:\Users\Uvanshankar\bedtime-ai\backend` | Node.js 20, Express, TypeScript, Zod, Jest | **PASSED (Green)** |
-| **Mobile** | [`UvanShankar/bedtime-ai-mobile`](https://github.com/UvanShankar/bedtime-ai-mobile) | `C:\Users\Uvanshankar\bedtime-ai\mobile` | React Native, Expo SDK 51, TypeScript, expo-av | **PASSED (Green)** |
+| **Mobile** | [`UvanShankar/bedtime-ai-mobile`](https://github.com/UvanShankar/bedtime-ai-mobile) | `C:\Users\Uvanshankar\bedtime-ai\mobile` | React Native 0.86, Expo SDK 57, React 19, TypeScript, expo-av | **PASSED (Green)** |
 
 ### GitHub Actions Workflows:
 - **Backend CI/CD** (`.github/workflows/ci-cd.yml`):
