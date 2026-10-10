@@ -8,6 +8,67 @@ export class MockLLMProvider implements LLMProvider {
     const childName = context.child.name;
     const topic = context.request.topic || "The Moonbeam Adventure";
     const languageCode = context.parent.languageCode || "en-US";
+    const isTamil =
+      languageCode.toLowerCase().startsWith("ta") ||
+      context.parent.language?.toLowerCase().includes("tamil");
+
+    if (isTamil) {
+      return {
+        title: `${topic} - நிலா சொன்ன கதை`,
+        languageCode: "ta",
+        summary: `நிலா வெளிச்சத்தில் ${childName}க்கு சொன்ன மென்மையான படுக்கை நேரக் கதை.`,
+        segments: [
+          {
+            id: "seg_1",
+            order: 1,
+            text: `கண்ணா ${childName}... ஒரு அழகான அமைதியான இரவு நேரத்துல, வானத்துல நிலா மாமா மெதுவா வந்துச்சாம்.`,
+            emotion: "warm",
+            pace: "slow",
+            energy: "low",
+            pauseBeforeMs: 300,
+            pauseAfterMs: 600,
+            emphasis: ["கண்ணா", "நிலா மாமா"],
+          },
+          {
+            id: "seg_2",
+            order: 2,
+            text: `${topic} பத்தி ஒரு அழகான ரகசியத்தை நிலா மாமா மெல்ல சொல்லுச்சாம். மரத்துல தூங்கற குட்டி குருவிகள் கூட அமைதியா கேட்டுச்சாம்.`,
+            emotion: "gentle",
+            pace: "slow",
+            energy: "low",
+            pauseBeforeMs: 400,
+            pauseAfterMs: 700,
+            emphasis: ["அழகான ரகசியம்"],
+          },
+          {
+            id: "seg_3",
+            order: 3,
+            text: `நம்ம ${childName} கண்ணை மூடி மெதுவா படுக்கையில சாய்ஞ்சதும், குளிர் காத்து வந்து தாலாட்டு பாடுச்சாம். நட்சத்திரங்கள் அழகா கண் சிமிட்டுச்சாம்.`,
+            emotion: "soothing",
+            pace: "slow",
+            energy: "gentle",
+            pauseBeforeMs: 400,
+            pauseAfterMs: 800,
+            emphasis: ["தாலாட்டு"],
+          },
+          {
+            id: "seg_4",
+            order: 4,
+            text: `நல்லா தூங்கு கண்ணா... இனிமையான கனவுகள் வரட்டும். குட் நைட்.`,
+            emotion: "soothing",
+            pace: "deliberate",
+            energy: "calm",
+            pauseBeforeMs: 500,
+            pauseAfterMs: 1000,
+            emphasis: ["நல்லா தூங்கு கண்ணா"],
+          },
+        ],
+        ending: {
+          style: "peaceful",
+          emotion: "soothing",
+        },
+      };
+    }
 
     return {
       title: `${topic} - A Bedtime Tale for ${childName}`,

@@ -14,31 +14,36 @@ export class DefaultStoryPromptBuilder implements StoryPromptBuilder {
     const tamilSpecificRules = isTamil
       ? `
 SPECIFIC TAMIL LANGUAGE & DIALECT RULES (VERY IMPORTANT):
-- MANDATORY: Write in NATURAL SPOKEN TAMIL (பேச்சுத் தமிழ்), exactly how parents talk to their children at home.
+- MANDATORY: Write in NATURAL SPOKEN TAMIL (இயல்பான பேச்சுத் தமிழ்), exactly how parents talk to their children at home in bed.
 - STRICTLY FORBIDDEN: Do NOT use "Thuya Tamil" (தூய தமிழ்), textbook Tamil (புத்தகத் தமிழ்), formal Tamil, or literary written prose.
 - NEVER USE formal/bookish words such as:
-  * "கூறியது" or "சொன்னது" -> ALWAYS use "சொல்லுச்சாம்", "சொல்லுச்சு", "கேட்டுச்சாம்"
-  * "விரும்புகிறேன்" -> ALWAYS use "ஆசைப்பட்டுச்சாம்", "வேணும்னு நினைச்சுச்சாம்"
-  * "செய்தது" -> ALWAYS use "பண்ணுச்சாம்", "செஞ்சுச்சாம்"
-  * "வந்தது" -> ALWAYS use "வந்துச்சாம்", "வந்துச்சு"
-  * "பார்த்தது" -> ALWAYS use "பாத்துச்சாம்", "பாத்துச்சு"
-  * "இருந்தது" -> ALWAYS use "இருந்துச்சாம்", "இருந்துச்சு"
-  * "ஆரம்பித்தார்கள்" -> ALWAYS use "ஆரம்பிச்சாங்க", "தொடங்குனாங்க"
-  * "அடைந்தது" -> ALWAYS use "ஆச்சு", "சந்தோஷப்பட்டுச்சாம்"
-  * "சென்றது" -> ALWAYS use "போச்சுதாம்", "போச்சாம்"
+  * "கூறினார்", "கூறினான்", "கூறியது" -> ALWAYS use "சொன்னான்", "சொன்னாரு", "சொல்லிச்சு", "சொல்லுச்சாம்"
+  * "சென்றான்", "சென்றது", "சென்றார்கள்" -> ALWAYS use "போனான்", "போச்சு", "போனாங்க", "போச்சாம்"
+  * "உண்டான்", "உண்டது", "அருந்தினான்" -> ALWAYS use "சாப்பிட்டான்", "சாப்பிட்டுச்சு", "குடிச்சான்"
+  * "கண்டான்", "கண்டது", "பார்த்தது" -> ALWAYS use "பார்த்தான்", "பார்த்துச்சு", "பாத்துச்சு"
+  * "மகிழ்ந்தான்", "மகிழ்ச்சியடைந்தார்" -> ALWAYS use "ரொம்ப சந்தோஷப்பட்டான்", "குஷி ஆயிட்டான்"
+  * "அங்குள்ள", "இங்குள்ள" -> ALWAYS use "அங்க இருக்கிற", "இங்க இருக்கிற"
+  * "செய்தான்", "செய்தது" -> ALWAYS use "பண்ணினான்", "செஞ்சான்", "பண்ணுச்சு"
+  * "அப்பொழுது", "இப்பொழுது" -> ALWAYS use "அப்போ", "இப்போ"
+  * "அதனால்", "எனவே" -> ALWAYS use "அதனால", "அதனாலதான்"
+  * "வந்தது" -> ALWAYS use "வந்துச்சு", "வந்துச்சாம்"
+  * "இருந்தது" -> ALWAYS use "இருந்துச்சு", "இருந்துச்சாம்"
+- STORYTELLING LOGIC & QUALITY (NO BLABBER):
+  * Every story must have clear cause-and-effect logic, relatable motivations, and a genuine heartfelt moral.
+  * Absolutely no rambling filler, repetitious babble, or disjointed sequences.
 - STORYTELLING MARKERS: Use warm, rhythmic oral storytelling words:
   "ஒரு ஊர்ல ஒரு குட்டி யானை இருந்துச்சாம்...", "அப்புறம் என்னாச்சு தெரியுமா?", "அப்டியே மெதுவா...", "நம்ம ${context.child.name} மாதிரி சமத்தா...".
 - DIALECT ADAPTATION (${context.parent.dialect || "Colloquial"}):
   * Madurai / Southern Tamil: Use warm, affectionate southern phrasing and particles: "அங்கன", "இங்கன", "அப்படியே", "கண்ணு", "ராசா", "தங்கம்", "சொல்லுச்சுப்பா", "இருந்துச்சாம்ப்பா".
-  * Chennai Tamil: Natural Madras conversational rhythm, friendly colloquial tone: "நம்ம குட்டி", "அப்புறம் என்னாச்சுன்னா...".
-  * Kongu / Coimbatore: Polite, tender warmth: "கண்ணு", "தங்கமே", "இருந்துதுங்க", "சொல்லுச்சுங்க".
-  * Tirunelveli / Nellai: Warm southern cadence: "லே", "செல்லக்குட்டி", "அப்படியே".
+  * Chennai Tamil: Natural Madras conversational rhythm, friendly colloquial tone: "நம்ம குட்டி", "அப்புறம் என்னாச்சுன்னா...", "சூப்பரா", "செம".
+  * Kongu / Coimbatore: Polite, tender warmth: "கண்ணு", "தங்கமே", "இருந்துதுங்க", "சொல்லுச்சுங்க", "சமத்தா".
+  * Tirunelveli / Nellai: Warm southern cadence: "லே", "செல்லக்குட்டி", "அப்படியே", "அடேங்கப்பா".
 `
       : `
 SPECIFIC SPOKEN LANGUAGE RULES:
 - Write in NATURAL, SPOKEN, EVERYDAY COLLOQUIAL ${context.parent.language}.
 - Do NOT use formal, literary, or textbook language.
-- Use natural spoken verb forms, conversational particles, and affectionate bedtime storytelling idioms.
+- Ensure clear story logic, cause-and-effect progression, no rambling, and a genuine moral.
 `;
 
     return `You are a loving parent and children's bedtime story writer storytelling directly to your child at bedtime.

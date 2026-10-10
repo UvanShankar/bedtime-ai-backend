@@ -4,12 +4,18 @@ import { AppError } from "../errors/AppError.js";
 export function errorHandler(err: any, req: Request, res: Response, _next: NextFunction) {
   const requestId = (req.headers["x-request-id"] as string) || `req_${Date.now()}`;
 
-  if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
+  const isAppError =
+    err instanceof AppError ||
+    err?.name === "AppError" ||
+    (Boolean(err?.statusCode) && Boolean(err?.code));
+
+  if (isAppError) {
+    return res.status(err.statusCode || 500).json({
       error: {
         code: err.code,
         message: err.message,
         requestId,
+        details: err.details,
       },
     });
   }
@@ -34,13 +40,12 @@ export function errorHandler(err: any, req: Request, res: Response, _next: NextF
     });
   }
 
-  // Mask unknown / internal error details to prevent leaking secrets or raw provider dumps
   console.error(`[Unhandled Error] [${requestId}]`, err);
 
-  return res.status(500).json({
+  return res.status(err?.statusCode || err?.status || 500).json({
     error: {
-      code: "UNKNOWN_ERROR",
-      message: "An internal server error occurred while processing your request",
+      code: err?.code || "INTERNAL_ERROR",
+      message: err?.message || "An internal server error occurred while processing your request",
       requestId,
     },
   });
